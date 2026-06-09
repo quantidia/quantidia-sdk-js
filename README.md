@@ -40,9 +40,12 @@ Add the script tag before your app code. The SDK exposes `window.Quantidia` once
     const SDK = await waitForSdk();
 
     SDK.init({
-      baseUrl: "https://your-instance.trusthub.cloud/integration",
-      apiBase: "https://your-instance.trusthub.cloud",
+      baseUrl: "https://dev.trusthub.cloud/integration",
+      apiBase: "https://dev.trusthub.cloud",
       view: "full", // "full" | "restricted" | "gateway"
+      forceNexu: false,
+      nexuUrl: "https://localhost:9895/rest/certificates",
+      nexuSignUrl: "https://localhost:9895/rest/sign",
     });
 
     // SDK is ready
@@ -93,9 +96,9 @@ await SDK.openSigningWithLogin({
   authLogin: {
     authReference: {
       environmentId: "your-environment-id",
-      userId: "external-user-id",       // optional
-      subscriptionId: "subscription-id", // optional
-      companyId: "company-id",           // optional
+      userId: "external-user-id",       
+      subscriptionId: "subscription-id", 
+      companyId: "company-id",           
     },
     authLogin: {
       username: "user@example.com",
@@ -128,23 +131,6 @@ await SDK.openSigningWithLogin({
   },
   docId: docIds[0],
   docIds: docIds,
-});
-```
-
----
-
-### 4. Using Nexu (local signing app)
-
-If your users sign with a local certificate via [Nexu](https://github.com/e-Contract/dssp), pass the Nexu URLs in `init`:
-
-```js
-SDK.init({
-  baseUrl: "https://your-instance.trusthub.cloud/integration",
-  apiBase: "https://your-instance.trusthub.cloud",
-  view: "full",
-  forceNexu: true,
-  nexuUrl: "https://localhost:9895/rest/certificates",
-  nexuSignUrl: "https://localhost:9895/rest/sign",
 });
 ```
 
