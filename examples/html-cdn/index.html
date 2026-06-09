@@ -5,61 +5,150 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Quantidia SDK — CDN Example</title>
   <style>
-    body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
-    button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
-    pre { background: #f4f4f4; padding: 12px; border-radius: 4px; overflow: auto; }
-    #output { margin-top: 20px; }
+    body { font-family: sans-serif; max-width: 640px; margin: 40px auto; padding: 0 20px; }
+    label { display: block; margin-top: 12px; font-size: 14px; font-weight: 600; }
+    input[type="text"], input[type="password"] { width: 100%; padding: 6px 8px; margin-top: 4px; box-sizing: border-box; }
+    button { margin-top: 20px; padding: 10px 24px; font-size: 15px; cursor: pointer; }
+    pre { background: #f4f4f4; padding: 12px; border-radius: 4px; overflow: auto; margin-top: 16px; min-height: 40px; }
+    h2 { margin-top: 28px; }
   </style>
 </head>
 <body>
   <h1>Quantidia SDK — CDN Example</h1>
-  <p>This page loads the SDK directly from jsDelivr — no build step required.</p>
+  <p>Minimal integration using only a <code>&lt;script&gt;</code> tag. No build step required.</p>
 
-  <button id="login-btn">Login via API</button>
+  <h2>Configuration</h2>
 
-  <div id="output"></div>
+  <label for="baseUrl">Integration URL</label>
+  <input id="baseUrl" type="text" value="https://your-instance.trusthub.cloud/integration" />
+
+  <label for="apiBase">API Base URL</label>
+  <input id="apiBase" type="text" value="https://your-instance.trusthub.cloud" />
+
+  <label for="apiKey">Api-Key</label>
+  <input id="apiKey" type="text" placeholder="your-api-key" />
+
+  <label for="environmentId">Environment ID</label>
+  <input id="environmentId" type="text" placeholder="your-environment-id" />
+
+  <h2>Credentials</h2>
+
+  <label for="username">Username</label>
+  <input id="username" type="text" placeholder="user@example.com" />
+
+  <label for="password">Password</label>
+  <input id="password" type="password" placeholder="••••••••" />
+
+  <h2>Document</h2>
+
+  <label for="pdfInput">PDF file</label>
+  <input id="pdfInput" type="file" accept="application/pdf" />
+
+  <button id="btn-sign" disabled>Sign Document</button>
+
+  <pre id="output">—</pre>
 
   <!--
-    Load the Quantidia SDK UMD bundle from jsDelivr.
-    Pin to a specific version in production to avoid unexpected breaking changes.
+    Load the Quantidia SDK from jsDelivr CDN.
+    window.Quantidia becomes available after this script loads.
+    Pin to a specific version (e.g. @1.0.4) in production.
   -->
   <script src="https://cdn.jsdelivr.net/npm/@quantidia/sdk@1/dist/quantidia-sdk.umd.min.js"></script>
 
   <script>
-    // After the script loads, all exports are available under window.Quantidia
-    const { DefaultApi, Configuration } = window.Quantidia;
-
     const output = document.getElementById("output");
+    const btnSign = document.getElementById("btn-sign");
+    let SDK = null;
+    let docIds = [];
 
-    function log(message, isError) {
-      const pre = document.createElement("pre");
-      pre.style.color = isError ? "red" : "green";
-      pre.textContent = message;
-      output.appendChild(pre);
+    // Poll until window.Quantidia is available
+    function waitForSdk(maxTries = 60, delayMs = 100) {
+      return new Promise((resolve, reject) => {
+        function check(triesLeft) {
+          if (window.Quantidia) return resolve(window.Quantidia);
+          if (triesLeft <= 0) return reject(new Error("SDK did not load"));
+          setTimeout(() => check(triesLeft - 1), delayMs);
+        }
+        check(maxTries);
+      });
     }
 
-    // Configure the API client pointing to your TrustHub instance
-    const api = new DefaultApi(
-      new Configuration({
-        basePath: "https://api.your-trusthub.com", // Replace with your API URL
-      })
-    );
-
-    document.getElementById("login-btn").addEventListener("click", async () => {
-      output.innerHTML = "";
+    async function init() {
       try {
-        await api.apiRestCoreAuthLoginPost({
-          apiRestCoreAuthLoginPostRequest: {
-            username: "user@example.com",  // Replace with real credentials
-            password: "secret",
-          },
+        SDK = await waitForSdk();
+
+        SDK.init({
+          baseUrl: document.getElementById("baseUrl").value,
+          apiBase: document.getElementById("apiBase").value,
+          view: "full",
+          // Uncomment to use Nexu local signing:
+          // forceNexu: true,
+          // nexuUrl: "https://localhost:9895/rest/certificates",
+          // nexuSignUrl: "https://localhost:9895/rest/sign",
         });
-        log("Login successful!");
+
+        output.textContent = "SDK ready.";
+        btnSign.disabled = false;
       } catch (err) {
-        log("Error: " + (err.message || err), true);
+        output.textContent = "SDK failed to load: " + err.message;
+      }
+    }
+
+    // Load PDF file into SDK memory when selected
+    document.getElementById("pdfInput").addEventListener("change", async (e) => {
+      if (!SDK) return;
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
+
+      try {
+        SDK.clearDocuments?.();
+        docIds = await SDK.addDocuments(files);
+        output.textContent = `${files.length} PDF(s) loaded. Ready to sign.`;
+      } catch (err) {
+        output.textContent = "Error loading PDF: " + err.message;
+      }
+    });
+
+    // Open signing modal on button click
+    btnSign.addEventListener("click", async () => {
+      if (!SDK || !docIds.length) {
+        output.textContent = "Load a PDF first.";
+        return;
+      }
+
+      const environmentId = document.getElementById("environmentId").value.trim();
+      const username      = document.getElementById("username").value.trim();
+      const password      = document.getElementById("password").value;
+      const apiKey        = document.getElementById("apiKey").value.trim();
+
+      if (!username || !password) {
+        output.textContent = "Enter username and password.";
+        return;
+      }
+
+      try {
+        output.textContent = "Opening signing modal...";
+
+        const result = await SDK.openSigningWithLogin({
+          authLogin: {
+            authReference: { environmentId },
+            authLogin: { username, password },
+          },
+          headersOverride: {
+            apiKey: apiKey || undefined,
+          },
+          docId: docIds[0],
+          docIds,
+        });
+
+        output.textContent = JSON.stringify(result, null, 2);
+      } catch (err) {
+        output.textContent = "Error: " + (err?.message || String(err));
         console.error(err);
       }
     });
+
+    document.addEventListener("DOMContentLoaded", init);
   </script>
 </body>
 </html>
