@@ -13,7 +13,7 @@
  */
 
 
-import * as runtime from '../../../sdk/client/runtime';
+import * as runtime from '../runtime';
 import type {
   ApiRestCoreAuthLoginPostRequest,
 } from '../models/index';
