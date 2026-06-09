@@ -1,9 +1,8 @@
 name: Publish SDK to NPM
 
 on:
-  push:
-    branches:
-      - master
+  release:
+    types: [published]
 
 # Provenance/OIDC: permite firmar el paquete con sigstore (npm publish --provenance)
 permissions:
