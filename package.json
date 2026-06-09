@@ -1,0 +1,59 @@
+{
+  "name": "@quantidia/sdk",
+  "version": "1.0.4",
+  "description": "Quantidia SDK for digital signature integrations (Fortify, Nexu, cloud signing)",
+  "type": "module",
+  "main": "./dist/quantidia-sdk.cjs",
+  "module": "./dist/quantidia-sdk.es.js",
+  "types": "./dist/src/index.d.ts",
+  "browser": "./dist/quantidia-sdk.umd.min.js",
+  "jsdelivr": "./dist/quantidia-sdk.umd.min.js",
+  "unpkg": "./dist/quantidia-sdk.umd.min.js",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/quantidia-sdk.es.js",
+      "require": "./dist/quantidia-sdk.cjs"
+    },
+    "./ui": {
+      "types": "./dist/src/ui.d.ts",
+      "import": "./dist/ui.mjs",
+      "require": "./dist/ui.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "npm run build:types && webpack --config webpack.config.js",
+    "build:types": "tsc --emitDeclarationOnly",
+    "test": "echo \"No tests configured yet\" && exit 0",
+    "prepublishOnly": "npm run build",
+    "copy:umd": "node -e \"require('fs').copyFileSync('dist/quantidia-sdk.umd.min.js','../public/quantidia-sdk.js')\""
+  },
+  "keywords": [
+    "quantidia",
+    "sdk",
+    "digital-signature",
+    "signature",
+    "trusthub",
+    "fortify",
+    "nexu",
+    "pades",
+    "pkcs11",
+    "esignature"
+  ],
+  "author": "Quantidia",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5",
+    "ts-loader": "^9",
+    "webpack": "^5",
+    "webpack-cli": "^5",
+    "clean-webpack-plugin": "^4",
+    "terser-webpack-plugin": "^5"
+  }
+}

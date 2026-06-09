@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quantidia SDK — CDN Example</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    pre { background: #f4f4f4; padding: 12px; border-radius: 4px; overflow: auto; }
+    #output { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Quantidia SDK — CDN Example</h1>
+  <p>This page loads the SDK directly from jsDelivr — no build step required.</p>
+
+  <button id="login-btn">Login via API</button>
+
+  <div id="output"></div>
+
+  <!--
+    Load the Quantidia SDK UMD bundle from jsDelivr.
+    Pin to a specific version in production to avoid unexpected breaking changes.
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/@quantidia/sdk@1/dist/quantidia-sdk.umd.min.js"></script>
+
+  <script>
+    // After the script loads, all exports are available under window.Quantidia
+    const { DefaultApi, Configuration } = window.Quantidia;
+
+    const output = document.getElementById("output");
+
+    function log(message, isError) {
+      const pre = document.createElement("pre");
+      pre.style.color = isError ? "red" : "green";
+      pre.textContent = message;
+      output.appendChild(pre);
+    }
+
+    // Configure the API client pointing to your TrustHub instance
+    const api = new DefaultApi(
+      new Configuration({
+        basePath: "https://api.your-trusthub.com", // Replace with your API URL
+      })
+    );
+
+    document.getElementById("login-btn").addEventListener("click", async () => {
+      output.innerHTML = "";
+      try {
+        await api.apiRestCoreAuthLoginPost({
+          apiRestCoreAuthLoginPostRequest: {
+            username: "user@example.com",  // Replace with real credentials
+            password: "secret",
+          },
+        });
+        log("Login successful!");
+      } catch (err) {
+        log("Error: " + (err.message || err), true);
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>

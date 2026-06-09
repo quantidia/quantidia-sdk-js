@@ -1,0 +1,9 @@
+.openapi-generator-ignore
+apis/DefaultApi.ts
+apis/index.ts
+docs/ApiRestCoreAuthLoginPostRequest.md
+docs/DefaultApi.md
+index.ts
+models/ApiRestCoreAuthLoginPostRequest.ts
+models/index.ts
+runtime.ts
