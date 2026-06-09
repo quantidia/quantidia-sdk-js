@@ -5,7 +5,9 @@ JavaScript/TypeScript SDK for [Quantidia](https://quantidia.com) digital signatu
 [![npm version](https://img.shields.io/npm/v/@quantidia/sdk)](https://www.npmjs.com/package/@quantidia/sdk)
 [![license](https://img.shields.io/npm/l/@quantidia/sdk)](./LICENSE)
 
----
+> **Work in progress** — documentation and examples are being validated.
+
+<!--
 
 ## Installation
 
@@ -120,6 +122,8 @@ await openSigningWithLogin({
 
 - **Browser**: Chrome 80+, Firefox 78+, Edge 80+, Safari 14+
 - **Node.js**: 18+ (for server-side or build environments)
+
+-->
 
 ---
 
