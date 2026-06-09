@@ -48,6 +48,10 @@
   ],
   "author": "Quantidia",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quantidia/quantidia-sdk-js"
+  },
   "devDependencies": {
     "typescript": "^5",
     "ts-loader": "^9",
