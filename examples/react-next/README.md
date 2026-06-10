@@ -14,7 +14,7 @@ import { DefaultApi, Configuration } from "@quantidia/sdk";
 
 export const api = new DefaultApi(
   new Configuration({
-    basePath: process.env.NEXT_PUBLIC_TRUSTHUB_API_URL!,
+    basePath: process.env.NEXT_PUBLIC_QUANTIDIA_API_URL!,
     accessToken: () => sessionStorage.getItem("access_token") ?? "",
   })
 );
@@ -59,7 +59,7 @@ import { useEffect } from "react";
 import { init, openSigningWithLogin } from "@quantidia/sdk/ui";
 
 // Initialize once at the app level (e.g., in layout.tsx or a provider)
-init({ baseUrl: process.env.NEXT_PUBLIC_TRUSTHUB_API_URL! });
+init({ baseUrl: process.env.NEXT_PUBLIC_QUANTIDIA_API_URL! });
 
 export function SignButton({ docId }: { docId: string }) {
   async function handleSign() {
@@ -79,7 +79,7 @@ export function SignButton({ docId }: { docId: string }) {
 Add to your `.env.local`:
 
 ```env
-NEXT_PUBLIC_TRUSTHUB_API_URL=https://api.your-trusthub.com
+NEXT_PUBLIC_QUANTIDIA_API_URL=https://api.your-trusthub.com
 ```
 
 ## Next.js Server Components note

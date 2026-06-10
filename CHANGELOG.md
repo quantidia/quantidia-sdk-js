@@ -38,6 +38,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 - Initial release
-- OpenAPI-generated client for TrustHub REST API
+- OpenAPI-generated client for Quantidia REST API
 - TypeScript typings
 - ESM, CJS, and UMD builds via Webpack

@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * TrustHub API
- * API pública de TrustHub
+ * Quantidia API
+ * API pública de Quantidia
  *
  * The version of the OpenAPI document: 1.0.0
  * 

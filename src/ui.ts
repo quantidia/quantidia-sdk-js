@@ -240,7 +240,7 @@ export function clearDocuments() {
 
 /* ========================= */
 
-const log = (...a: any[]) => console.log("[TrustHub SDK]", ...a);
+const log = (...a: any[]) => console.log("[Quantidia SDK]", ...a);
 
 // --------- PERF / WARMUP (opt: no rompe nada) ----------
 let lastFrameT0 = 0;
