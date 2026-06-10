@@ -1,6 +1,6 @@
 {
   "name": "@quantidia/sdk",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "Quantidia SDK for digital signature integrations (Fortify, Nexu, cloud signing)",
   "type": "module",
   "main": "./dist/quantidia-sdk.cjs",
