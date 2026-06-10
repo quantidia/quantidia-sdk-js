@@ -7,6 +7,14 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.0.7] - 2026-06-10
+
+### Changed
+- CDN URL updated to latest (removed pinned major version tag)
+- NPM section note added to README (documentation in progress)
+
+---
+
 ## [1.0.6] - 2026-06-10
 
 ### Changed

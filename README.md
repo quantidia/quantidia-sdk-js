@@ -12,7 +12,7 @@ JavaScript SDK for integrating Quantidia digital signature into any web applicat
 Add the script tag before your app code. The SDK exposes `window.Quantidia` once loaded.
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@quantidia/sdk@1/dist/quantidia-sdk.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@quantidia/sdk/dist/quantidia-sdk.umd.min.js"></script>
 ```
 
 ---
@@ -22,7 +22,7 @@ Add the script tag before your app code. The SDK exposes `window.Quantidia` once
 ### 1. Load and initialize
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@quantidia/sdk@1/dist/quantidia-sdk.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@quantidia/sdk/dist/quantidia-sdk.umd.min.js"></script>
 <script>
   // Wait for the SDK to be available on window.Quantidia
   function waitForSdk(maxTries = 60, delayMs = 100) {
@@ -137,6 +137,8 @@ await SDK.openSigningWithLogin({
 ---
 
 ## NPM / ES Module
+
+> 📖 Full NPM and ES Module documentation is in progress.
 
 ```bash
 npm install @quantidia/sdk
