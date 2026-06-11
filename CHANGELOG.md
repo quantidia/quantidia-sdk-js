@@ -7,6 +7,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.0.8] - 2026-06-11
+
+### Fixed
+- `./ui` export path corrected from `dist/ui.mjs` → `dist/ui.js` so `import from "@quantidia/sdk/ui"` resolves correctly in Vite, webpack and other bundlers
+
+### Added
+- NPM / ES Module documentation in README
+
+---
+
 ## [1.0.7] - 2026-06-10
 
 ### Changed
