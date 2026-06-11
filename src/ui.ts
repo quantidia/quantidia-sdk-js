@@ -33,12 +33,16 @@ type OpenSigningWithLoginParams =
     docIds?: string[];
   };
 
+export type QuantidiaJavaOptions = {
+  force?: boolean;
+  certificates?: string;
+  sign?: string;
+};
+
 export type InitOptions = {
   baseUrl: string;
   apiBase?: string;
-  forceNexu?: boolean;
-  nexuUrl?: string;
-  nexuSignUrl?: string;
+  quantidiaJava?: QuantidiaJavaOptions;
   view?: "full" | "restricted" | "gateway";
 };
 
@@ -627,14 +631,15 @@ async function handleNexuRequest(ev: MessageEvent) {
 
     // 🔹 CASO 1: certificados (compat total)
     if (!kind || kind === "cert") {
-      if (!cfg.nexuUrl) throw new Error("Nexu URL no configurada en SDK");
-      res = await fetch(cfg.nexuUrl, { method: "GET", mode: "cors" });
+      const url = cfg.quantidiaJava?.certificates;
+      if (!url) throw new Error("quantidiaJava.certificates no configurado en SDK");
+      res = await fetch(url, { method: "GET", mode: "cors" });
     }
 
     // 🔹 CASO 2: firma (nuevo)
     else if (kind === "sign") {
-      const url = cfg.nexuSignUrl || cfg.nexuUrl;
-      if (!url) throw new Error("Nexu SIGN URL no configurada en SDK");
+      const url = cfg.quantidiaJava?.sign || cfg.quantidiaJava?.certificates;
+      if (!url) throw new Error("quantidiaJava.sign no configurado en SDK");
 
       res = await fetch(url, {
         method: "POST",
@@ -887,7 +892,8 @@ function openFrame({
   // ✅ guardamos tokens/INIT para reinyectar si el iframe refresca
   storeInitMsg(finalInitMsg);
 
-  const { baseUrl, forceNexu } = cfg;
+  const { baseUrl } = cfg;
+  const forceNexu = cfg.quantidiaJava?.force;
 
   // ✅ warmup origin (no bloquea)
   warmupOrigin(baseUrl);

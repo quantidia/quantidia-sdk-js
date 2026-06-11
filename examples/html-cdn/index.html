@@ -81,10 +81,12 @@
           baseUrl: document.getElementById("baseUrl").value,
           apiBase: document.getElementById("apiBase").value,
           view: "full",
-          // Uncomment to use Nexu local signing:
-          // forceNexu: true,
-          // nexuUrl: "https://localhost:9895/rest/certificates",
-          // nexuSignUrl: "https://localhost:9895/rest/sign",
+          // Uncomment to use Nexu / Quantidia Java local signing:
+          // quantidiaJava: {
+          //   force: true,
+          //   certificates: "https://localhost:9895/rest/certificates",
+          //   sign: "https://localhost:9895/rest/sign",
+          // },
         });
 
         output.textContent = "SDK ready.";

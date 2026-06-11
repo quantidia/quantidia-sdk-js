@@ -40,12 +40,14 @@ Add the script tag before your app code. The SDK exposes `window.Quantidia` once
     const SDK = await waitForSdk();
 
     SDK.init({
-      baseUrl: "https://dev.trusthub.cloud/integration",
-      apiBase: "https://dev.trusthub.cloud",
+      baseUrl: "https://YOUR_QUANTIDIA_URL/integration",
+      apiBase: "https://YOUR_QUANTIDIA_URL",
       view: "full", // "full" | "restricted" | "gateway"
-      forceNexu: false,
-      nexuUrl: "https://localhost:9895/rest/certificates",
-      nexuSignUrl: "https://localhost:9895/rest/sign",
+      quantidiaJava: {
+        force: false,
+        certificates: "https://localhost:9895/rest/certificates",
+        sign: "https://localhost:9895/rest/sign",
+      },
     });
 
     // SDK is ready
@@ -172,12 +174,14 @@ Call `init()` once, before any other function. The same options apply as in the 
 
 ```js
 init({
-  baseUrl: "https://your-backend.example.com/integration",
-  apiBase: "https://your-backend.example.com",
+  baseUrl: "https://YOUR_QUANTIDIA_URL/integration",
+  apiBase: "https://YOUR_QUANTIDIA_URL",
   view: "full",        // "full" | "restricted" | "gateway"
-  forceNexu: false,
-  nexuUrl: "https://localhost:9895/rest/certificates",
-  nexuSignUrl: "https://localhost:9895/rest/sign",
+  quantidiaJava: {
+    force: false,
+    certificates: "https://localhost:9895/rest/certificates",
+    sign: "https://localhost:9895/rest/sign",
+  },
 });
 ```
 
@@ -186,9 +190,10 @@ init({
 | `baseUrl` | `string` | Yes | Base URL of the signing integration endpoint |
 | `apiBase` | `string` | Yes | Base URL of the API (without path) |
 | `view` | `string` | No | Signing UI view mode (`"full"` default) |
-| `forceNexu` | `boolean` | No | Always use Nexu for local certificate signing |
-| `nexuUrl` | `string` | No | Nexu certificates endpoint |
-| `nexuSignUrl` | `string` | No | Nexu sign endpoint |
+| `quantidiaJava` | `object` | No | Local Nexu / Quantidia Java configuration |
+| `quantidiaJava.force` | `boolean` | No | Always route signing through the local Java agent |
+| `quantidiaJava.certificates` | `string` | No | Local agent certificates endpoint |
+| `quantidiaJava.sign` | `string` | No | Local agent sign endpoint |
 
 ---
 
