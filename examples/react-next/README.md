@@ -59,7 +59,10 @@ import { useEffect } from "react";
 import { init, openSigningWithLogin } from "@quantidia/sdk/ui";
 
 // Initialize once at the app level (e.g., in layout.tsx or a provider)
-init({ baseUrl: process.env.NEXT_PUBLIC_QUANTIDIA_API_URL! });
+init({
+  baseUrl: `${process.env.NEXT_PUBLIC_QUANTIDIA_API_URL!}/integration`,
+  apiBase: process.env.NEXT_PUBLIC_QUANTIDIA_API_URL!,
+});
 
 export function SignButton({ docId }: { docId: string }) {
   async function handleSign() {

@@ -20,24 +20,24 @@
   <h2>Configuration</h2>
 
   <label for="baseUrl">Integration URL</label>
-  <input id="baseUrl" type="text" value="https://your-instance.quantidia.com/integration" />
+  <input id="baseUrl" type="text" value="https://test.quantidia.com/integration" />
 
   <label for="apiBase">API Base URL</label>
-  <input id="apiBase" type="text" value="https://your-instance.quantidia.com" />
+  <input id="apiBase" type="text" value="https://test.quantidia.com" />
 
   <label for="apiKey">Api-Key</label>
-  <input id="apiKey" type="text" placeholder="your-api-key" />
+  <input id="apiKey" type="text" placeholder="your-api-key" value="" />
 
   <label for="environmentId">Environment ID</label>
-  <input id="environmentId" type="text" placeholder="your-environment-id" />
+  <input id="environmentId" type="text" placeholder="your-environment-id" value="" />
 
   <h2>Credentials</h2>
 
   <label for="username">Username</label>
-  <input id="username" type="text" placeholder="user@example.com" />
+  <input id="username" type="text" placeholder="user@example.com" value="" />
 
   <label for="password">Password</label>
-  <input id="password" type="password" placeholder="••••••••" />
+  <input id="password" type="password" placeholder="••••••••" value="" />
 
   <h2>Document</h2>
 
@@ -81,12 +81,11 @@
           baseUrl: document.getElementById("baseUrl").value,
           apiBase: document.getElementById("apiBase").value,
           view: "full",
-          // Uncomment to use Nexu / Quantidia Java local signing:
-          // quantidiaJava: {
-          //   force: true,
-          //   certificates: "https://localhost:9895/rest/certificates",
-          //   sign: "https://localhost:9895/rest/sign",
-          // },
+          quantidiaJava: {
+            force: true,
+            certificates: "https://localhost:9895/rest/certificates",
+            sign: "https://localhost:9895/rest/sign",
+          },
         });
 
         output.textContent = "SDK ready.";

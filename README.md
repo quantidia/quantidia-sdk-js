@@ -125,7 +125,7 @@ await SDK.openSigningWithLogin({
       environmentId: "your-environment-id",
     },
     authLogin: {
-      accessToken: "eyJhbGci...",
+      access_token: "eyJhbGci...",
     },
   },
   headersOverride: {
@@ -153,7 +153,7 @@ The package ships two entry points:
 | Entry point | Contents |
 |---|---|
 | `@quantidia/sdk` | OpenAPI REST client (generated) |
-| `@quantidia/sdk/ui` | Signing UI — `init`, `openSigningWithLogin`, `addDocuments`, `clearDocuments`, `close`, `listSignedDocuments`, `getSignedDocumentBytes` |
+| `@quantidia/sdk/ui` | Signing UI — `init`, `openSigningWithLogin`, `openSigning`, `addDocument(s)`, `removeDocument`, `clearDocuments`, `close`, `listSignedDocuments`, `getSignedDocumentBytes`, `removeSignedDocument`, `clearSignedDocuments` |
 
 ```js
 import {
@@ -270,7 +270,7 @@ const result = await openSigningWithLogin({
       environmentId: "your-environment-id",
     },
     authLogin: {
-      accessToken: "eyJhbGci...",
+      access_token: "eyJhbGci...",
     },
   },
   headersOverride: {
@@ -282,6 +282,44 @@ const result = await openSigningWithLogin({
 ```
 
 `openSigningWithLogin` returns a `Promise` that resolves when the user completes signing and rejects if the user cancels or an error occurs.
+
+---
+
+### 4. Retrieve signed documents
+
+Signed PDFs never leave the browser automatically — they're kept in an in-memory store so the integrator decides when and how to pick them up. There are two ways to get them:
+
+**a) From the resolved promise.** The `signed` field on the result already lists the signed documents (metadata only, no bytes):
+
+```js
+const result = await SDK.openSigningWithLogin({ /* ... */ });
+console.log(result.signed);
+// [{ id, name, mime, size, createdAt, sourceDocId }, ...]
+```
+
+**b) On demand, via the store API** (also available on `window.Quantidia` for CDN usage):
+
+```js
+// List everything currently stored (metadata only)
+const docs = SDK.listSignedDocuments();
+// [{ id, name, mime, size, createdAt, sourceDocId }, ...]
+
+// Get the raw bytes for one signed document
+const bytes = SDK.getSignedDocumentBytes(docs[0].id); // Uint8Array | null
+const blob = new Blob([bytes], { type: docs[0].mime });
+const url = URL.createObjectURL(blob);
+// e.g. trigger a download, or upload `blob` to your own backend
+
+// Remove one signed document from memory once you're done with it
+SDK.removeSignedDocument(docs[0].id);
+
+// Or clear everything at once
+SDK.clearSignedDocuments();
+```
+
+`getSignedDocumentBytes` returns a **copy** of the bytes each time — the original stays in the store until you explicitly remove it. The store is also cleared automatically every time a new signing session is opened (`openSigning` / `openSigningWithLogin`), so make sure you've picked up any bytes you need before starting a new one.
+
+For source documents loaded via `addDocuments`, the equivalent cleanup helpers are `removeDocument(docId)` and `clearDocuments()`.
 
 ---
 
