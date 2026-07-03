@@ -43,6 +43,7 @@ Add the script tag before your app code. The SDK exposes `window.Quantidia` once
       baseUrl: "https://YOUR_QUANTIDIA_URL/integration",
       apiBase: "https://YOUR_QUANTIDIA_URL",
       view: "full", // "full" | "restricted" | "gateway"
+      flow: "SSO_SIGN",
       quantidiaJava: {
         force: false,
         certificates: "https://localhost:9895/rest/certificates",
@@ -177,6 +178,7 @@ init({
   baseUrl: "https://YOUR_QUANTIDIA_URL/integration",
   apiBase: "https://YOUR_QUANTIDIA_URL",
   view: "full",        // "full" | "restricted" | "gateway"
+  flow: "SSO_SIGN",   
   quantidiaJava: {
     force: false,
     certificates: "https://localhost:9895/rest/certificates",
@@ -190,6 +192,7 @@ init({
 | `baseUrl` | `string` | Yes | Base URL of the signing integration endpoint |
 | `apiBase` | `string` | Yes | Base URL of the API (without path) |
 | `view` | `string` | No | Signing UI view mode (`"full"` default) |
+| `flow` | `string` | No (recommended) | Which SDK flow to run. Currently only `"SSO_SIGN"` (login + sign, today's only flow) exists |
 | `quantidiaJava` | `object` | No | Local Nexu / Quantidia Java configuration |
 | `quantidiaJava.force` | `boolean` | No | Always route signing through the local Java agent |
 | `quantidiaJava.certificates` | `string` | No | Local agent certificates endpoint |
