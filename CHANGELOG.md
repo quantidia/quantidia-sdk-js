@@ -7,6 +7,17 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.1.4] - 2026-07-03
+
+### Fixed
+- The SDK's own close button ("✕" drawn over the iframe) and Escape key now settle the `openSigningWithLogin()` / `openSigning()` promise (resolve with `{status:"signed", signed:[...]}` if documents were signed, reject with `{status:"cancelled"}` otherwise). Previously it called `close()` directly without resolving or rejecting, so the promise hung forever if the user dismissed the modal via that button instead of a `TRUSTHUB_DONE`/`CANCELLED`/`ERROR` message from the iframe.
+- `./ui` (and the CDN/UMD build, `window.Quantidia`) now expose `addDocument`, `removeDocument`, `clearDocuments`, `listSignedDocuments`, `getSignedDocumentBytes`, `removeSignedDocument`, `clearSignedDocuments` — previously only available via `import { ... } from "@quantidia/sdk/ui"`, missing from the CDN bundle.
+
+### Documentation
+- README: documented how to retrieve/download signed documents (`result.signed`, the store API, and a CDN download-link example).
+
+---
+
 ## [1.0.8] - 2026-06-11
 
 ### Fixed

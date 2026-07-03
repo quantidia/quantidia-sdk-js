@@ -442,7 +442,7 @@ function overlayUI() {
     height: "22px",
   });
   x.innerHTML = "";
-  x.onclick = close;
+  x.onclick = closeByUser;
 
   const f = document.createElement("iframe");
   f.allow = "hid; usb; serial; clipboard-read; clipboard-write; fullscreen";
@@ -487,6 +487,23 @@ function close() {
   // perf refs
   lastFrameT0 = 0;
   lastFrameUrl = null;
+}
+
+// ✅ Cierre disparado por el usuario (botón "✕" propio del SDK / tecla Escape).
+// A diferencia de close() (usado internamente tras TRUSTHUB_DONE/CANCELLED/ERROR,
+// que ya resuelven `pending` antes de llamarlo), este cierre NO viene con ningún
+// aviso del iframe — así que hay que resolver/rechazar `pending` acá mismo, o la
+// promesa de openSigningWithLogin()/openSigning() queda colgada para siempre.
+function closeByUser() {
+  const p = pending;
+  const stored = listSignedDocuments();
+  close();
+  if (!p) return;
+  if (stored.length > 0) {
+    p.resolve({ status: "signed", signed: stored });
+  } else {
+    p.reject({ status: "cancelled" });
+  }
 }
 
 // ── Quantidia Desktop WebSocket proxy ───────────────────────────────────────
@@ -827,7 +844,7 @@ function listen() {
   });
 
   window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") close();
+    if (e.key === "Escape") closeByUser();
   });
 }
 
