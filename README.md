@@ -297,7 +297,7 @@ console.log(result.signed);
 // [{ id, name, mime, size, createdAt, sourceDocId }, ...]
 ```
 
-**b) On demand, via the store API** (also available on `window.Quantidia` for CDN usage):
+**b) On demand, via the store API.** These are plain functions on `SDK` — same names whether you're using the CDN build (`window.Quantidia`) or the npm/ESM `@quantidia/sdk/ui` import:
 
 ```js
 // List everything currently stored (metadata only)
@@ -306,9 +306,6 @@ const docs = SDK.listSignedDocuments();
 
 // Get the raw bytes for one signed document
 const bytes = SDK.getSignedDocumentBytes(docs[0].id); // Uint8Array | null
-const blob = new Blob([bytes], { type: docs[0].mime });
-const url = URL.createObjectURL(blob);
-// e.g. trigger a download, or upload `blob` to your own backend
 
 // Remove one signed document from memory once you're done with it
 SDK.removeSignedDocument(docs[0].id);
@@ -316,6 +313,30 @@ SDK.removeSignedDocument(docs[0].id);
 // Or clear everything at once
 SDK.clearSignedDocuments();
 ```
+
+**Triggering a browser download** (CDN example — no build tooling needed) — wrap the bytes in a `Blob`, turn that into an object URL, and click a hidden `<a download>`:
+
+```js
+function downloadSignedDocument(meta) {
+  const bytes = SDK.getSignedDocumentBytes(meta.id);
+  if (!bytes) return;
+
+  const blob = new Blob([bytes], { type: meta.mime || "application/pdf" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = meta.name || "signed.pdf";
+  a.click();
+
+  URL.revokeObjectURL(url); // safe to revoke right after click() has fired
+}
+
+// Call this once the modal has closed, e.g. after openSigningWithLogin resolves/rejects:
+SDK.listSignedDocuments().forEach(downloadSignedDocument);
+```
+
+To instead **upload the signed PDF to your own backend** rather than downloading it, skip the `<a>` and just `fetch()` the `Blob` (or the raw `Uint8Array`) to your endpoint — see [`examples/html-cdn/index.html`](./examples/html-cdn/index.html) for a full working page that renders a download link per signed document as soon as the modal closes.
 
 `getSignedDocumentBytes` returns a **copy** of the bytes each time — the original stays in the store until you explicitly remove it. The store is also cleared automatically every time a new signing session is opened (`openSigning` / `openSigningWithLogin`), so make sure you've picked up any bytes you need before starting a new one.
 

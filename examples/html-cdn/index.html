@@ -11,6 +11,11 @@
     button { margin-top: 20px; padding: 10px 24px; font-size: 15px; cursor: pointer; }
     pre { background: #f4f4f4; padding: 12px; border-radius: 4px; overflow: auto; margin-top: 16px; min-height: 40px; }
     h2 { margin-top: 28px; }
+    #signedDocs { list-style: none; margin: 8px 0 0; padding: 0; }
+    #signedDocs li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; margin-top: 6px; font-size: 14px; }
+    #signedDocs a { color: #2563eb; text-decoration: none; font-weight: 600; }
+    #signedDocs a:hover { text-decoration: underline; }
+    #signedDocs .meta { color: #777; font-size: 12px; }
   </style>
 </head>
 <body>
@@ -20,24 +25,24 @@
   <h2>Configuration</h2>
 
   <label for="baseUrl">Integration URL</label>
-  <input id="baseUrl" type="text" value="https://test.quantidia.com/integration" />
+  <input id="baseUrl" type="text" value="https://QUNATIDIA_URL/integration" />
 
   <label for="apiBase">API Base URL</label>
-  <input id="apiBase" type="text" value="https://test.quantidia.com" />
+  <input id="apiBase" type="text" value="https://QUNATIDIA_URL" />
 
   <label for="apiKey">Api-Key</label>
-  <input id="apiKey" type="text" placeholder="your-api-key" value="" />
+  <input id="apiKey" type="text" placeholder="your-api-key" />
 
   <label for="environmentId">Environment ID</label>
-  <input id="environmentId" type="text" placeholder="your-environment-id" value="" />
+  <input id="environmentId" type="text" placeholder="your-environment-id" />
 
   <h2>Credentials</h2>
 
   <label for="username">Username</label>
-  <input id="username" type="text" placeholder="user@example.com" value="" />
+  <input id="username" type="text" placeholder="user@example.com" />
 
   <label for="password">Password</label>
-  <input id="password" type="password" placeholder="••••••••" value="" />
+  <input id="password" type="password" placeholder="••••••••"/>
 
   <h2>Document</h2>
 
@@ -47,6 +52,13 @@
   <button id="btn-sign" disabled>Sign Document</button>
 
   <pre id="output">—</pre>
+
+  <h2>Signed documents</h2>
+  <p style="margin: 4px 0 0; font-size: 13px; color: #777;">
+    Populated from the browser's in-memory store after the SDK modal closes — this page never
+    receives the signed bytes automatically, you pull them explicitly (see script below).
+  </p>
+  <ul id="signedDocs"></ul>
 
   <!--
     Load the Quantidia SDK from jsDelivr CDN.
@@ -58,8 +70,51 @@
   <script>
     const output = document.getElementById("output");
     const btnSign = document.getElementById("btn-sign");
+    const signedDocsEl = document.getElementById("signedDocs");
     let SDK = null;
     let docIds = [];
+    let signedObjectUrls = [];
+
+    // Pull whatever is in the signed-documents store and render download links.
+    // Call this once the SDK modal has closed (signed, cancelled, or errored —
+    // a partial batch may still have produced signed bytes worth keeping).
+    function renderSignedDocuments() {
+      // revoke previous object URLs to avoid leaking memory across runs
+      signedObjectUrls.forEach((url) => URL.revokeObjectURL(url));
+      signedObjectUrls = [];
+      signedDocsEl.innerHTML = "";
+
+      const docs = SDK.listSignedDocuments();
+      if (!docs.length) return;
+
+      for (const meta of docs) {
+        const bytes = SDK.getSignedDocumentBytes(meta.id);
+        if (!bytes) continue;
+
+        const blob = new Blob([bytes], { type: meta.mime || "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        signedObjectUrls.push(url);
+
+        const li = document.createElement("li");
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = meta.name || "signed.pdf";
+        a.textContent = meta.name || "signed.pdf";
+
+        const span = document.createElement("span");
+        span.className = "meta";
+        span.textContent = `${(meta.size / 1024).toFixed(1)} KB`;
+
+        li.appendChild(a);
+        li.appendChild(span);
+        signedDocsEl.appendChild(li);
+      }
+
+      // Once you've handed the bytes off to the user (or uploaded them
+      // yourself), clear the store so the next signing session starts fresh:
+      // SDK.clearSignedDocuments();
+    }
 
     // Poll until window.Quantidia is available
     function waitForSdk(maxTries = 60, delayMs = 100) {
@@ -146,6 +201,10 @@
       } catch (err) {
         output.textContent = "Error: " + (err?.message || String(err));
         console.error(err);
+      } finally {
+        // The modal is closed by this point in every case (signed, cancelled
+        // or errored) — pull whatever ended up in the signed-documents store.
+        renderSignedDocuments();
       }
     });
 
