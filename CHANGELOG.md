@@ -7,6 +7,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.1.6] - 2026-07-03
+
+### Fixed
+- Fortify's WebSocket relay for embedded/iframe mode (`handleFortifyWsOpen` default URL) used port `1337` instead of Fortify's actual port `31337`. This only affected the fallback default (the webapp side always sends the real URL), but was corrected for consistency with the rest of the codebase.
+
+---
+
 ## [1.1.4] - 2026-07-03
 
 ### Fixed

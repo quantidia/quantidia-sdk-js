@@ -137,6 +137,27 @@ await SDK.openSigningWithLogin({
 });
 ```
 
+#### Custom signature position (optional)
+
+By default the signature is placed at `x: 200, y: 200` on page `1`, sized `150x100` (PDF points). To control it, pass `signatureRect` alongside the auth params:
+
+```js
+await SDK.openSigningWithLogin({
+  // ...auth params
+  docId: docIds[0],
+  docIds,
+  signatureRect: {
+    page: 2, // 1-based page number
+    x: 100,  // top-left corner, in PDF points
+    y: 300,
+    w: 200,  // optional, box width (default 150)
+    h: 80,   // optional, box height (default 100)
+  },
+});
+```
+
+Coordinates use the **top-left corner of the page as the origin** (`x` grows right, `y` grows down), in PDF points — the same unit as the page size (e.g. an A4 page is `595 x 842`). `signatureRect` is also accepted by `SDK.openSigning({ pdfUrl, signatureRect })`.
+
 ---
 
 ## NPM / ES Module
@@ -285,6 +306,8 @@ const result = await openSigningWithLogin({
 ```
 
 `openSigningWithLogin` returns a `Promise` that resolves when the user completes signing and rejects if the user cancels or an error occurs.
+
+Both `openSigningWithLogin` and `openSigning` also accept an optional `signatureRect: { page, x, y, w?, h? }` to control where the signature is placed — see [Custom signature position](#custom-signature-position-optional) above.
 
 ---
 

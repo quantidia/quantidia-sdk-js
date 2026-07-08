@@ -599,7 +599,7 @@ const _fortifySessions = new Map<string, { ws: WebSocket; src: WindowProxy; orig
 function handleFortifyWsOpen(ev: MessageEvent) {
   const d = ev.data || {};
   const sid = d.sessionId as string;
-  const url = (d.url as string) || "wss://127.0.0.1:1337";
+  const url = (d.url as string) || "wss://127.0.0.1:31337";
   const src = ev.source as WindowProxy;
   const origin = ev.origin;
 

@@ -44,6 +44,27 @@
   <label for="password">Password</label>
   <input id="password" type="password" placeholder="••••••••" />
 
+  <h2>Signature position</h2>
+  <p style="margin: 4px 0 0; font-size: 13px; color: #777;">
+    Optional — where the signature box is placed on the document. Coordinates are in PDF points,
+    origin at the top-left corner of the page.
+  </p>
+
+  <label for="rectPage">Page (1-based)</label>
+  <input id="rectPage" type="text" value="1" />
+
+  <label for="rectX">X</label>
+  <input id="rectX" type="text" value="200" />
+
+  <label for="rectY">Y</label>
+  <input id="rectY" type="text" value="200" />
+
+  <label for="rectW">Width (optional)</label>
+  <input id="rectW" type="text" value="150" />
+
+  <label for="rectH">Height (optional)</label>
+  <input id="rectH" type="text" value="100" />
+
   <h2>Document</h2>
 
   <label for="pdfInput">PDF file(s)</label>
@@ -183,6 +204,13 @@
         return;
       }
 
+      const page = Number(document.getElementById("rectPage").value);
+      const x    = Number(document.getElementById("rectX").value);
+      const y    = Number(document.getElementById("rectY").value);
+      const w    = Number(document.getElementById("rectW").value) || undefined;
+      const h    = Number(document.getElementById("rectH").value) || undefined;
+      const signatureRect = (page && x && y) ? { page, x, y, w, h } : undefined;
+
       try {
         output.textContent = "Opening signing modal...";
 
@@ -196,6 +224,7 @@
           },
           docId: docIds[0],
           docIds,
+          signatureRect,
         });
 
         output.textContent = JSON.stringify(result, null, 2);
