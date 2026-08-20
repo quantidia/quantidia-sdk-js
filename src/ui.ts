@@ -257,6 +257,10 @@ function safeOrigin(urlStr: string) {
     return "";
   }
 }
+function closeIconUrl() {
+  const origin = (cfg?.baseUrl && safeOrigin(cfg.baseUrl)) || window.location.origin;
+  return `${origin}/images/icons/Close.svg`;
+}
 function pickSupportedLng(input?: string | null): "es-AR" | "en-US" | "it-IT" | null {
   if (!input) return null;
 
@@ -435,7 +439,7 @@ function overlayUI() {
     cursor: "pointer",
     zIndex: "2",
     backgroundColor: "transparent",
-    backgroundImage: "url('https://dev.trusthub.cloud/images/icons/Close.svg')",
+    backgroundImage: `url('${closeIconUrl()}')`,
     backgroundRepeat: "no-repeat",
     backgroundPosition: "center",
     width: "22px",
