@@ -469,10 +469,56 @@ function overlayUI() {
   return { bg, f, loader };
 }
 
+/* =========================
+   ✅ Borde "grabando" a pantalla completa del host
+   ========================= */
+// El toggle REC vive dentro del iframe, que está acotado al tamaño del modal,
+// así que no puede pintar el borde sobre toda la pantalla del navegador.
+// El iframe nos avisa con { source:"trusthub_iframe", type:"RECORDING_STATE" }
+// y lo dibujamos acá, en el documento host.
+let recBorderEl: HTMLElement | null = null;
+
+function setHostRecording(on: boolean) {
+  try {
+    if (on) {
+      if (recBorderEl) return;
+      const el = document.createElement("div");
+      el.setAttribute("data-th-sdk-recording", "");
+      css(el, {
+        position: "fixed",
+        inset: "0",
+        border: "6px solid #ef4444",
+        pointerEvents: "none",
+        zIndex: "2147483647",
+      });
+      const pill = document.createElement("div");
+      css(pill, {
+        position: "absolute",
+        top: "0",
+        left: "50%",
+        transform: "translateX(-50%)",
+        background: "#ef4444",
+        color: "#fff",
+        font: "600 13px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial",
+        padding: "6px 10px 4px",
+        borderRadius: "0 0 6px 6px",
+      });
+      pill.textContent = "Recording";
+      el.appendChild(pill);
+      document.body.appendChild(el);
+      recBorderEl = el;
+    } else if (recBorderEl) {
+      recBorderEl.remove();
+      recBorderEl = null;
+    }
+  } catch { }
+}
+
 function close() {
   try {
     overlayEl?.remove();
   } catch { }
+  setHostRecording(false);
   overlayEl = null;
   pending = null;
   loaderEl = null;
@@ -715,6 +761,14 @@ function listen() {
       const un = typeof d?.un === "string" ? d.un : undefined;
 
       storeInitMsg({ t, rt, id, un });
+      return;
+    }
+
+    // ✅ Estado de "grabación" (toggle REC dentro del iframe): pintamos el
+    // borde rojo sobre TODA la pantalla del host, no solo sobre el modal.
+    if (d.source === "trusthub_iframe" && d.type === "RECORDING_STATE") {
+      if (currentIframeWin && ev.source !== currentIframeWin) return;
+      setHostRecording(!!d.recording);
       return;
     }
 
