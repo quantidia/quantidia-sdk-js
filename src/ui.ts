@@ -697,6 +697,45 @@ function handleFortifyWsOpen(ev: MessageEvent) {
   openWs(url);
 }
 
+// ── Fortify HTTP relay ──────────────────────────────────────────────────────
+// The @webcrypto-local client does a plain `fetch()` to
+// https://127.0.0.1:31337/.well-known/webcrypto-socket BEFORE opening the
+// WebSocket (getServerInfo). From the SDK iframe (non-local origin) that fetch
+// is blocked by Private Network Access, so the client reports "Fortify not
+// detected" before the WS relay is ever used. Relay it through this page, which
+// can reach the local Fortify server directly.
+async function handleFortifyHttpRequest(ev: MessageEvent) {
+  const d = ev.data || {};
+  const reqId = d.reqId as string;
+  const src = ev.source as WindowProxy;
+  const origin = ev.origin;
+
+  try {
+    const res = await fetch(d.url as string, {
+      method: (d.method as string) || "GET",
+      mode: "cors",
+    });
+    const body = await res.text();
+    src.postMessage(
+      {
+        source: "trusthub",
+        type: "FORTIFY_HTTP_RESPONSE",
+        reqId,
+        ok: true,
+        status: res.status,
+        contentType: res.headers.get("content-type") || "application/json",
+        body,
+      },
+      origin
+    );
+  } catch (e: any) {
+    src.postMessage(
+      { source: "trusthub", type: "FORTIFY_HTTP_RESPONSE", reqId, ok: false, error: e?.message || "fetch failed" },
+      origin
+    );
+  }
+}
+
 async function handleNexuRequest(ev: MessageEvent) {
   const d = ev.data || {};
   const kind = d.kind as "cert" | "sign" | undefined;
@@ -836,6 +875,12 @@ function listen() {
     // Quantidia Desktop WebSocket proxy
     if (d.source === "trusthub_iframe" && d.type === "QUANTIDIA_REQUEST") {
       handleQuantidiaRequest(ev);
+      return;
+    }
+
+    // Fortify HTTP relay (getServerInfo / .well-known)
+    if (d.source === "trusthub_iframe" && d.type === "FORTIFY_HTTP_REQUEST") {
+      handleFortifyHttpRequest(ev);
       return;
     }
 
