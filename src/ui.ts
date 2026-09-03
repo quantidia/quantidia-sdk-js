@@ -656,6 +656,11 @@ function handleFortifyWsOpen(ev: MessageEvent) {
   function openWs(wsUrl: string) {
     try {
       const ws = new WebSocket(wsUrl);
+      // Fortify's @webcrypto-local protocol is binary; its client only handles
+      // frames that arrive as ArrayBuffer (Blob frames are silently dropped).
+      // Without this the relayed connection never completes its handshake and
+      // the Fortify panel spins forever ("Fortify not detected").
+      ws.binaryType = "arraybuffer";
       _fortifySessions.set(sid, { ws, src, origin });
 
       ws.onopen = () => src.postMessage({ source: "trusthub", type: "FORTIFY_WS_OPENED", sessionId: sid }, origin);
@@ -663,6 +668,11 @@ function handleFortifyWsOpen(ev: MessageEvent) {
         const data = mev.data;
         if (data instanceof ArrayBuffer) {
           src.postMessage({ source: "trusthub", type: "FORTIFY_WS_MESSAGE", sessionId: sid, binary: true, data }, origin, [data]);
+        } else if (data instanceof Blob) {
+          // Defensive: some environments still deliver Blob despite binaryType.
+          data.arrayBuffer().then((buf) => {
+            src.postMessage({ source: "trusthub", type: "FORTIFY_WS_MESSAGE", sessionId: sid, binary: true, data: buf }, origin, [buf]);
+          });
         } else {
           src.postMessage({ source: "trusthub", type: "FORTIFY_WS_MESSAGE", sessionId: sid, binary: false, data }, origin);
         }
